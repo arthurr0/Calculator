@@ -14,6 +14,7 @@ public class Calculator implements ActionListener {
 
     private final JFrame frame;
     private final JTextField textField;
+    private final JTextField contentField;
     private final List<Button> upperButtons = new ArrayList<>();
     private final List<Button> mainButtons = new ArrayList<>();
 
@@ -31,10 +32,21 @@ public class Calculator implements ActionListener {
         Font font = new Font("Roboto", Font.BOLD, 20);
         frame.setFont(font);
 
+        //content
+        contentField = new JTextField();
+        contentField.setFont(new Font("Roboto", Font.BOLD, 15));
+        contentField.setHorizontalAlignment(JTextField.RIGHT);
+        contentField.setBackground(new Color(0x263640));
+        contentField.setBounds(50, 15, 335, 20);
+        contentField.setEditable(false);
+        contentField.setForeground(Color.WHITE);
+        contentField.setBorder(BorderFactory.createLineBorder(new Color(0x63adfc), 2));
+        frame.add(contentField);
+
         //textField
         textField = new JTextField();
         textField.setFont(font);
-        textField.setHorizontalAlignment(JLabel.RIGHT);
+        textField.setHorizontalAlignment(JTextField.RIGHT);
         textField.setBackground(new Color(0x263640));
         textField.setBounds(50, 50, 335, 50);
         textField.setEditable(false);
@@ -47,12 +59,12 @@ public class Calculator implements ActionListener {
         upperPanel.setLayout(new GridLayout(1, 2, 10, 10));
         upperPanel.setBounds(50, 120, 335, 40);
         upperPanel.setBackground(new Color(0x263640));
-        Button clear = new Button("Wyczyść", new Color(0xfd6f71), this, null, ButtonType.CLEAR);
-        upperButtons.add(clear);
-        upperPanel.add(clear.getButton());
-        Button delete = new Button("Usuń", new Color(0xfd6f71), this, null, ButtonType.DELETE);
+        Button delete = new Button("Delete", new Color(0xfd6f71), this, null, ButtonType.DELETE);
         upperButtons.add(delete);
         upperPanel.add(delete.getButton());
+        Button clear = new Button("Clear", new Color(0xfd6f71), this, null, ButtonType.CLEAR);
+        upperButtons.add(clear);
+        upperPanel.add(clear.getButton());
         frame.add(upperPanel);
 
         //buttonsPanel
@@ -84,6 +96,13 @@ public class Calculator implements ActionListener {
         frame.setVisible(true);
     }
 
+    public static String formatNumber(double d) {
+        if (d == (long) d)
+            return String.format("%d", (long) d);
+        else
+            return String.format("%s", d);
+    }
+
     @Override
     public void actionPerformed(ActionEvent event) {
 
@@ -98,6 +117,7 @@ public class Calculator implements ActionListener {
             textField.setText("");
         } else if (button.getType() == ButtonType.DELETE) {
             textField.setText("");
+            contentField.setText("");
             numberOne = 0;
         } else if (button.getType() == ButtonType.NUMBER) {
             textField.setText(textField.getText().concat(String.valueOf(button.getValue())));
@@ -106,8 +126,9 @@ public class Calculator implements ActionListener {
         } else if (button.getType() == ButtonType.OPERATOR) {
             operator = button.getOperator();
             numberOne = Double.parseDouble(textField.getText());
-            System.out.println(numberOne);
             textField.setText("");
+
+            contentField.setText(formatNumber(numberOne) + operator.getSign());
         } else if (button.getType() == ButtonType.EQUALS) {
             double numberTwo = Double.parseDouble(textField.getText());
 
@@ -121,8 +142,9 @@ public class Calculator implements ActionListener {
                 result = numberOne / numberTwo;
             }
 
-            textField.setText(String.valueOf(result));
             numberOne = result;
+            textField.setText(formatNumber(result));
+            contentField.setText("");
         }
     }
 
